@@ -1,0 +1,161 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{D9D6E242-F8AF-46E4-B9FD-80ECBC20BA3E}</UniqueIdentifier>
+      <Extensions>qrc;*</Extensions>
+      <ParseFiles>false</ParseFiles>
+    </Filter>
+    <Filter Include="Form Files">
+      <UniqueIdentifier>{99349809-55BA-4b9d-BF79-8FDBB0286EB3}</UniqueIdentifier>
+      <Extensions>ui</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{D9D6E242-F8AF-46E4-B9FD-80ECBC20BA3E}</UniqueIdentifier>
+      <Extensions>qrc;*</Extensions>
+      <ParseFiles>false</ParseFiles>
+    </Filter>
+    <Filter Include="Generated Files">
+      <UniqueIdentifier>{71ED8ED8-ACB9-4CE9-BBE1-E00B30144E11}</UniqueIdentifier>
+      <Extensions>moc;h;cpp</Extensions>
+      <SourceControlFiles>False</SourceControlFiles>
+    </Filter>
+    <Filter Include="Header Files\Image">
+      <UniqueIdentifier>{d6ef498f-37cd-4008-8ee1-4228930a287e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Image">
+      <UniqueIdentifier>{b2bf735d-6781-4671-98ee-901a6514295f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Qt">
+      <UniqueIdentifier>{df0e4f0c-aa9e-4c0a-8c87-ddb60a8b59b7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Qt">
+      <UniqueIdentifier>{f84dcdda-b2e5-45c4-bffd-544d2682fc8d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\HW">
+      <UniqueIdentifier>{a54834c3-a1b8-48ed-875d-86154618e036}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\HW">
+      <UniqueIdentifier>{8ca3e3d3-96d1-4628-9f2d-ef9217d1f374}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GUI.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Realsense.cpp">
+      <Filter>Source Files\Image</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Image_process.cpp">
+      <Filter>Source Files\Image</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Headpose.cpp">
+      <Filter>Source Files\Image</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Matrix.cpp">
+      <Filter>Source Files\Image</Filter>
+    </ClCompile>
+    <ClCompile Include="Openpose.cpp">
+      <Filter>Source Files\Image</Filter>
+    </ClCompile>
+    <ClCompile Include="Debug.cpp">
+      <Filter>Source Files\Qt</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Pose_estimation.cpp">
+      <Filter>Source Files\Image</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Opengl.cpp">
+      <Filter>Source Files\Qt</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Setting.cpp">
+      <Filter>Source Files\Qt</Filter>
+    </ClCompile>
+    <ClCompile Include="QML.cpp">
+      <Filter>Source Files\Qt</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Robot.cpp">
+      <Filter>Source Files\HW</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\SerialCommand.cpp">
+      <Filter>Source Files\HW</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Serial.cpp">
+      <Filter>Source Files\HW</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <QtMoc Include="GUI.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="Inc\Realsense.hpp">
+      <Filter>Header Files\Image</Filter>
+    </QtMoc>
+    <QtMoc Include="Inc\Image_process.hpp">
+      <Filter>Header Files\Image</Filter>
+    </QtMoc>
+    <QtMoc Include="Inc\Headpose.hpp">
+      <Filter>Header Files\Image</Filter>
+    </QtMoc>
+    <QtMoc Include="Inc\Openpose.hpp">
+      <Filter>Header Files\Image</Filter>
+    </QtMoc>
+    <QtMoc Include="Inc\Qml_integrator.hpp">
+      <Filter>Header Files\Qt</Filter>
+    </QtMoc>
+    <QtMoc Include="Inc\Pose_estimation.hpp">
+      <Filter>Header Files\Image</Filter>
+    </QtMoc>
+    <QtMoc Include="Inc\Opengl.hpp">
+      <Filter>Header Files\Qt</Filter>
+    </QtMoc>
+    <QtMoc Include="Inc\Setting.hpp">
+      <Filter>Header Files\Qt</Filter>
+    </QtMoc>
+    <QtMoc Include="Inc\Robot.hpp">
+      <Filter>Header Files\HW</Filter>
+    </QtMoc>
+    <QtMoc Include="Inc\Serial.h">
+      <Filter>Header Files\HW</Filter>
+    </QtMoc>
+  </ItemGroup>
+  <ItemGroup>
+    <QtUic Include="GUI.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
+  </ItemGroup>
+  <ItemGroup>
+    <QtRcc Include="GUI.qrc">
+      <Filter>Resource Files</Filter>
+    </QtRcc>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Inc\Matrix.hpp">
+      <Filter>Header Files\Image</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\Debug.h">
+      <Filter>Header Files\Qt</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\SerialCommand.h">
+      <Filter>Header Files\HW</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Qml\main.qml">
+      <Filter>Form Files</Filter>
+    </None>
+    <None Include="Resources\Qml\Controlpanel.qml">
+      <Filter>Form Files</Filter>
+    </None>
+  </ItemGroup>
+</Project>

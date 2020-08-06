@@ -1,0 +1,12 @@
+<RCC>
+    <qresource prefix="/GUI">
+        <file>Resources/Qml/main.qml</file>
+        <file>Resources/Qml/Controlpanel.qml</file>
+    </qresource>
+    <qresource prefix="/Image">
+        <file>Resources/Checkbox_Off.png</file>
+        <file>Resources/Checkbox_On.png</file>
+        <file>Resources/ajax-loader.gif</file>
+        <file>Resources/image/tray_icon.png</file>
+    </qresource>
+</RCC>

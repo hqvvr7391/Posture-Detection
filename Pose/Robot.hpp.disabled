@@ -1,0 +1,119 @@
+#pragma once
+#ifndef __ROBOTARM_H_
+#define __ROBOTARM_H_
+
+#include <iostream>
+#include "Matrix.hpp"
+#include "qthread.h"
+#include "qopengl.h"
+#include "qopenglfunctions.h"
+
+
+
+class RobotArm : public QThread
+{
+	Q_OBJECT
+public:
+	RobotArm();
+
+	// Robot's arm controls
+	static float baseTransX; // 0
+	static float baseTransZ;
+	static float baseSpin;       // 1
+	static float shoulderAng;  // 2
+	static float elbowAng;
+	static float wristAng;      // 3
+	static float wristTwistAng;
+	static float fingerAng1;    // 4
+	static float fingerAng2;
+
+	// Robot's colors
+	static unsigned char* arms;
+	static unsigned char* joints;// = { 0, 68, 119 };
+	static unsigned char* fingers;// = { 150, 0, 24 };
+	static unsigned char* fingerJoints;// = { 128, 128, 128 };
+
+
+	// User interface global variables
+	static bool leftButtonDown;    // Mouse stuff
+	static float oldX, oldY, newX, newY;
+	static int robotControl;
+
+	static void DrawUnitCylinder(int numSegs);  // x,y,z in [0,1], Y-axis is up
+	static void DrawUnitSphere(int numSegs);  // x,y,z in [0,1]
+	static void DrawJoint(int numSegs);
+	static void DrawBase(int numSegs);
+	static void DrawArmSegment(int numSegs);
+	static void DrawWrist(int numSegs);
+	static void DrawFingerBase(int numSegs);
+
+	static void DrawRobotArm(int numSegs);
+
+	/*static void myDisplay()
+	{
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+		glMatrixMode(GL_MODELVIEW);
+		glLoadIdentity();
+		GLU.gluLookAt(0.f, 2.f, 4.f, 0.f, 0.5f, 0.f, 0.f, 1.f, 0.f);
+
+		DrawGroundPlane(16);
+		DrawRobotArm(16);
+
+		Glut.glutSwapBuffers();
+	}
+
+	static void myReshape(int w, int h)
+	{
+		glViewport(0, 0, w, h);
+
+		glMatrixMode(GL_PROJECTION);
+		glLoadIdentity();
+		GLU.gluPerspective(30, w / h, 0.1, 10);
+
+		glMatrixMode(GL_MODELVIEW);
+		glLoadIdentity();
+		glTranslatef(1.0f, 0.5f, -7.0f);
+	}
+
+	static void myIdle()
+	{
+		Glut.glutPostRedisplay();
+	}
+
+	static void MotionFunc(int x, int y)
+	{
+		oldX = newX;
+		oldY = newY;
+		newX = x;
+		newY = y;
+		float RelX = (newX - oldX) / Glut.glutGet(Glut.GLUT_WINDOW_WIDTH);
+		float RelY = (newY - oldY) / Glut.glutGet(Glut.GLUT_WINDOW_HEIGHT);
+		if (leftButtonDown)
+			switch (robotControl)
+			{
+			case 0:
+				baseTransX += RelX;
+				baseTransZ += RelY;
+				break;
+			case 1:
+				baseSpin += RelX * 180;
+				break;
+			case 2:
+				shoulderAng += RelY * -90;
+				elbowAng += RelX * 90;
+				break;
+			case 3:
+				wristAng += RelY * -180;
+				wristTwistAng += RelX * 180;
+				break;
+			case 4:
+				fingerAng1 += RelY * 90;
+				fingerAng2 += RelX * 180;
+				break;
+			};
+	}*/
+};
+
+#else
+#endif
