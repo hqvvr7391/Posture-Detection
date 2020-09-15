@@ -1,0 +1,629 @@
+import QtQuick 2.13
+import QtQuick.Window 2.13
+import QtQuick.Controls 2.13
+import QtQuick.Extras 1.4
+import Qt.labs.platform 1.1
+
+import QSystemTrayIcon 1.0
+import librealsense2 1.0
+import Image_process 1.0
+import Headpose 1.0
+import Openpose 1.0
+import Pose_estimation 1.0
+import myextension 1.0
+import OpenGLUnderQML 1.0
+
+
+ApplicationWindow {
+    id: window
+    visible: true
+    width: 2400
+    height: 1000
+    color: "#000000"
+    title: qsTr("Capstone")
+
+
+
+    /* QML_GUI {
+        id: gui
+    }*/
+    /*Setting {
+        id: setting
+    }*/
+
+    Image_proc {
+        id: proc
+
+        onFinished: {
+            console.log("ImageProcess Finished")
+        }
+
+        onRequest_Image: {
+            realsense.request_image()
+        }
+
+        onSendFrame_Q: {
+            camwiew.setImage(frame)
+
+        }
+
+        onPreprocessed: {
+            pose.start()
+            //display.upd()
+        }
+    }
+
+    Realsense {
+        id: realsense
+		property string text: "asdfdsfa"
+        Component.onCompleted: {
+            proc.get_realPointer(realsense)
+        }
+
+        onStarted: {
+            proc.get_realPointer(realsense)
+        }
+        onFinished: {
+            console.log("Realsense Finished")
+        }
+
+
+        onSendFrame_Q: {
+            //camwiew.setImage(frame)
+        }
+
+        onFrameGenerated: {
+            proc.receiveFrame()
+            head.receiveFrame()
+            body.receiveFrame()
+        }
+
+        onPipe_onoff: {
+            camera_Switch.en_disable(true)
+            proc.onoff(toggled)
+
+        }
+
+    }
+
+    Head {
+        id: head
+
+        Component.onCompleted: {
+            proc.get_headPointer(head)
+        }
+
+        onStarted: {
+            proc.get_headPointer(head)
+        }
+
+        onSendF: {
+            proc.receive_head()
+
+        }
+    }
+
+	Body {
+        id: body
+        Component.onCompleted: {
+            proc.get_bodyPointer(body)
+        }
+
+        onStarted: {
+            proc.get_bodyPointer(body)
+        }
+
+        onSendF: {
+            proc.receive_body()
+        }
+        onWrapper_onoff: {
+            //body_Switch.en_disable(true)
+            proc.body_Status(state)
+			body_Switch.en_disable(true)
+        }
+
+    }
+
+    Pose {
+        id: pose
+
+        Component.onCompleted: {
+            pose.get_imagePointer(proc)
+            renderer.get_posePointer(pose)
+        }
+
+        onStarted:{
+            pose.get_imagePointer(proc)
+
+        }
+        onTurtleneck_led: {
+            turtleneck_led.active = degree
+        }
+        onTurtleneck_signal: {
+            systemTray.showMessage(qsTr("거북목 자세로 컴퓨터를 사용중입니다."), qsTr("지금과 같은 자세는 목 건강에 위협이 됩니다. 바른 자세로 앉아주세요.
+"), SystemTrayIcon.Warning, 1000)
+        }
+
+        onScoliosis_led: {
+            scoliosis_led.active = degree
+        }
+        onScoliosis_signal: {
+            systemTray.showMessage(qsTr("척추가 휘어져 있는 상태입니다."), qsTr("지금과 같은 자세는 척추 건강에 위협이 됩니다. 바른 자세로 앉아주세요."), SystemTrayIcon.Warning, 1000)
+        }
+
+        onPose_signal: {
+            systemTray.showMessage(qsTr("올바르지 못한 자세로 컴퓨터를 사용중입니다."), qsTr("바른 자세를 통해 허리 건강을 지키세요 "), SystemTrayIcon.Critical, 1000)
+        }
+
+    }
+
+    QSystemTrayIcon {
+        id: systemTray
+
+        // Initial initialization of the system tray
+        Component.onCompleted: {
+            icon = iconTray             // Set icon
+            toolTip = "Tray Program"
+            show();
+            //trayMenu.popup()
+            //systemTray.showMessage(qsTr("You are in a turtleneck pose."), qsTr("Something important came up"), SystemTrayIcon.Critical, 1000)
+        }
+
+        /* By clicking on the tray icon define the left or right mouse button click was.
+         * If left, then hide or open the application window.
+         * If right, then open the System Tray menu
+         * */
+        onActivated: {
+            if(reason === 1){
+                trayMenu.open()
+            } else {0
+                if(window.visibility === Window.Hidden) {
+                    window.show()
+                } else {
+                    window.hide()
+                }
+            }
+        }
+    }
+
+    // Menu system tray
+   Menu {
+        id: trayMenu
+
+        MenuItem {
+            text: qsTr("Maximize window")
+            onTriggered: window.show()
+        }
+
+        MenuItem {
+            text: qsTr("Exit")
+            onTriggered: {
+                checkTray.checked = false
+                window.close()
+            }
+        }
+    }
+
+
+    onClosing: {
+        if(checkTray.checked === true){
+            close.accepted = false
+            systemTray.show()
+            window.hide()
+        } else {
+            systemTray.hide()
+            renderer.shutdown()
+            Qt.quit()
+        }
+    }
+
+	Controlpanel{
+	}
+
+    Flickable {
+        id: flickable
+		x: 0
+        y: 0
+        width: 500
+        height: parent.height
+        anchors.left: parent.left
+        anchors.leftMargin: 0
+        transformOrigin: Item.TopLeft
+        flickableDirection: Flickable.VerticalFlick
+        contentWidth: width; contentHeight: 1600
+
+        Rectangle {
+            width: parent.width
+            height: parent.height
+
+            transformOrigin: Item.TopLeft
+            anchors.right: flickable.left
+            y: parent.visibleArea * parent.height
+
+            color: "#303030"
+
+            Text {
+                id: element
+                x: 30
+                y: 237
+                text: qsTr("<font color='#fefefe' size='5'>Scolio Degree</font>")
+                font.pixelSize: 12
+            }
+        }
+
+        ScrollBar.vertical: ScrollBar {
+            width: 10
+            anchors.left: parent.right // adjust the anchor as suggested by derM
+            policy: ScrollBar.AsNeeded
+        }
+
+        Slider {
+            id: scolio_degree
+            x: 140
+            y: 275
+            width: 350
+            height: 40
+            anchors.right: parent.right
+            anchors.rightMargin: 10
+            value: 7.5
+            rotation: 180
+            from: 2
+            to: 10
+            stepSize: 0.5
+
+            Component.onCompleted: settings.setValue("scolio_degree", this.value)
+            onMoved: {
+                settings.setValue("scolio_degree", this.value)
+            }
+        }
+
+        Slider {
+            id: turtle_degree
+            x: 140
+            y: 358
+            width: 350
+            height: 40
+            anchors.right: parent.right
+            anchors.rightMargin: 10
+            transformOrigin: Item.Center
+            value: 3.5
+            rotation: 180
+            from: 1
+            to: 7
+            stepSize: 0.5
+
+            Component.onCompleted: settings.setValue("turtle_degree", this.value)
+            onMoved: {
+                settings.setValue("turtle_degree", this.value)
+            }
+        }
+
+        ComboBox {
+            id: alert_timer
+            x: 300
+            y: 235
+            anchors.right: parent.right
+            anchors.rightMargin: 60
+            textRole: "text"
+            model: ListModel {
+                id: cbItems
+                ListElement { text: "10초" }
+                ListElement { text: "20초" }
+                ListElement { text: "30초" }
+                ListElement { text: "45초" }
+                ListElement { text: "1분" }
+                ListElement { text: "2분" }
+                ListElement { text: "5분" }
+                ListElement { text: "10분" }
+            }
+        }
+
+		ComboBox {
+            id: mode
+            x: 300
+            y: 125
+            anchors.right: parent.right
+            anchors.rightMargin: 60
+            textRole: "text"
+            model: ListModel {
+                id: itemlist
+                ListElement { text: "Head Tracking" }
+                ListElement { text: "Vision Protection" }
+                ListElement { text: "Pose Detection" }
+                ListElement { text: "Manual" }
+            }
+			onActivated:
+			{
+			}
+        }
+
+        SwitchDelegate {
+            id: camera_Switch
+            x: 25
+            y: 422
+            width: parent.width - 50
+            height: 50
+            text: "<font color='#fefefe' size='5'>" + qsTr("Camera") + "</font>"
+            transformOrigin: Item.Left
+
+            anchors.right: parent.right
+            anchors.rightMargin: 25
+
+            Component.onCompleted: {
+
+            }
+
+            onToggled:{
+                realsense.onoff(checked)
+
+                this.en_disable(false)
+            }
+
+            function en_disable(toggled) {
+                this.enabled = toggled
+            }
+        }
+
+        Slider {
+            id: distance
+            x: 140
+            y: 519
+            width: 350
+            height: 40
+            anchors.right: parent.right
+            anchors.rightMargin: 10
+            from: 0.5
+            stepSize: 0.1
+            rotation: 180
+            to: 3
+            value: 1
+
+            onMoved: {
+                settings.setValue("distance", this.value)
+                //console.log("%f", settings.value("distance"))
+            }
+
+        }
+
+        SwitchDelegate {
+            id: head_Switch
+            x: 25
+            y: 591
+            width: parent.width - 50
+            height: 50
+            //enabled: false
+            text: "<font color='#fefefe' size='5'>" + qsTr("Face") + "</font>"
+            transformOrigin: Item.Left
+            anchors.right: parent.right
+            anchors.rightMargin: 25
+
+            Component.onCompleted: {
+
+            }
+
+            onToggled: {
+                head.onoff(checked)
+                proc.head_Status(checked)
+
+            }
+
+        }
+
+        SwitchDelegate {
+            id: body_Switch
+            x: 25
+            y: 659
+            width: parent.width - 50
+            height: 50
+            text: "<font color='#fefefe' size='5'>" + qsTr("Body") + "</font>"
+            anchors.rightMargin: 25
+            anchors.right: parent.right
+            transformOrigin: Item.Left
+
+            onToggled: {
+                body.onoff(checked)
+				en_disable(false)
+            }
+			function en_disable(toggled) {
+                this.enabled = toggled
+            }
+
+        }
+
+        Text {
+            id: element1
+            x: 30
+            y: 327
+            text: qsTr("<font color='#fefefe' size='5'>Turtleneck Degree</font>")
+            font.pixelSize: 12
+        }
+
+        CheckBox {
+            id: checkTray
+            x: 36
+            y: 730
+            //anchors.centerIn: parent
+            text: qsTr("<font color='#fefefe' size='5'>Enable minimizing to system tray</font>")
+        }
+
+
+
+
+
+    }
+    Rectangle {
+        id: camview_rec
+        width: 640
+        height: 480
+        x: 762
+        y: 260
+        color:window.color
+
+        ImageItem {
+            id: camwiew
+            width: camview_rec.width
+            height: camview_rec.height
+            x: 0
+            y: 0
+
+        }
+    }
+
+    Item {
+        id: camview_rec2
+        width: 640
+        height: 640
+        x: 800 + width
+        y: 200
+
+
+        /*Display {
+            id: display
+            width: parent.width
+            height: parent.height
+
+            Component.onCompleted: {
+                get_posePointer(pose)
+            }
+            //anchors.fill:parent
+
+        }*/
+
+        MouseArea {
+            anchors.fill: parent
+            onPressed: {
+                renderer.get_msStart(mouseX,  mouseY)
+            }
+            onPositionChanged: {
+                renderer.get_msPoint(mouseX,  mouseY)
+                //console.log("x=", mouseX, "y=" , mouseY);
+            }
+        }
+
+
+        Renderer {
+            id: renderer
+            anchors.fill: parent
+
+            Component.onCompleted: get_posePointer(pose);
+        }
+
+
+    }
+    Rectangle {
+        x: 506
+        y: 45
+        width: 195
+        height: 703
+        color: window.color
+
+
+
+        StatusIndicator {
+            id: turtleneck_led
+            x: 32
+            y: 129
+            width: 100
+            height: 100
+            color: "#805500"
+        }
+
+
+        StatusIndicator {
+            id: scoliosis_led
+            x: 32
+            y: 8
+            width: 100
+            height: 100
+            color: "#fec120"
+        }
+    }
+
+    ListModel {
+        id: value
+
+        ListElement {
+            name: "Head X"
+            cost: 0
+        }
+        ListElement {
+            name: "Head Y"
+            cost: 0
+
+        }
+        ListElement {
+            name: "Head Z"
+            cost: 0
+        }
+    }
+    Component {
+        id: fruitDelegate
+        Item {
+            x: 510
+            y: 50
+            width: 200; height: 25
+            Text { text: "<font color='#fefefe' size='5'>" + name + "</font>"; anchors.left: parent.left }
+            Text { text: "<font color='#fefefe' size='5'>" + cost + "</font>"; anchors.right: parent.right }
+        }
+    }
+
+    Text {
+        id: element2
+        x: 31
+        y: 491
+        text: qsTr("<font color='#bebebe' size='5'>Camera Depth</font>")
+        font.pixelSize: 12
+    }
+
+    Text {
+        id: element3
+        x: 635
+        y: 156
+        text: qsTr("<font color='#fefefe' size='15'>Scoliosis</font>")
+        font.bold: true
+        font.pixelSize: 20
+    }
+
+    Text {
+        id: element4
+        x: 635
+        y: 278
+        text: qsTr("<font color='#fefefe' size='30'>Turtleneck</font>")
+        font.bold: true
+        font.pixelSize: 20
+    }
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*##^## Designer {
+    D{i:39;anchors_height:100;anchors_width:100;anchors_x:32;anchors_y:8}
+}
+ ##^##*/

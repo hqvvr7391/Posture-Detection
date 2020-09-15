@@ -1,0 +1,515 @@
+import QtQuick 2.13
+import QtQuick.Window 2.13
+import QtQuick.Controls 2.13
+import QtQuick.Extras 1.4
+import Qt.labs.platform 1.1
+
+/*
+import QSystemTrayIcon 1.0
+import librealsense2 1.0
+import Image_process 1.0
+import Headpose 1.0
+import Openpose 1.0
+import Pose_estimation 1.0
+import myextension 1.0
+import OpenGLUnderQML 1.0
+*/
+
+ApplicationWindow {
+    id: window
+    visible: true
+    width: 2400
+    height: 1000
+    color: "#303030"
+    title: qsTr("Capstone")
+    
+    
+    
+    /* QML_GUI {
+        id: gui
+    }*/
+    /*Setting {
+        id: setting
+    }*/
+    
+    Image_proc {
+        id: proc
+        
+        onFinished: {
+            console.log("ImageProcess Finished")
+        }
+        
+        onRequest_Image: {
+            realsense.request_image()
+        }
+        
+        onSendFrame_Q: {
+            camwiew.setImage(frame)
+            
+        }
+        
+        onPreprocessed: {
+            pose.start()
+            display.upd()
+        }
+    }
+    
+    Realsense {
+        id: realsense
+        
+        Component.onCompleted: {
+            proc.get_realPointer(realsense)
+        }
+        
+        onStarted: {
+            proc.get_realPointer(realsense)
+        }
+        onFinished: {
+            console.log("Realsense Finished")
+        }
+        
+        
+        onSendFrame_Q: {
+            //camwiew.setImage(frame)
+        }
+        
+        onFrameGenerated: {
+            proc.receiveFrame()
+            head.receiveFrame()
+            body.receiveFrame()
+        }
+        
+        onPipe_onoff: {
+            camera_Switch.en_disable(true)
+            proc.onoff(toggled)
+            
+        }
+        
+    }
+    
+    Head {
+        id: head
+        
+        Component.onCompleted: {
+            proc.get_headPointer(head)
+        }
+        
+        onStarted: {
+            proc.get_headPointer(head)
+        }
+        
+        onSendF: {
+            proc.receive_head()
+            
+        }
+    }
+    
+    Body {
+        id: body
+        Component.onCompleted: {
+            proc.get_bodyPointer(body)
+        }
+        
+        onStarted: {
+            proc.get_bodyPointer(body)
+        }
+        
+        onSendF: {
+            proc.receive_body()
+        }
+        onWrapper_onoff: {
+            //body_Switch.en_disable(true)
+            proc.body_Status(state)
+        }
+        
+    }
+    
+    Pose {
+        id: pose
+        
+        Component.onCompleted: {
+            pose.get_imagePointer(proc)
+            display.get_posePointer(pose)
+        }
+        
+        onStarted:{
+            pose.get_imagePointer(proc)
+            display.get_posePointer(pose)
+        }
+        onTurtleneck_led: {
+            turtleneck_led.active = degree
+        }
+        onTurtleneck_signal: {
+            systemTray.showMessage(qsTr("You are in a turtleneck pose."), qsTr("Something important came up"), SystemTrayIcon.Warning, 1000)
+        }
+        
+        onScoliosis_led: {
+            scoliosis_led.active = degree
+        }
+        onScoliosis_signal: {
+            systemTray.showMessage(qsTr("Your backborn is twisted"), qsTr("Something important came up"), SystemTrayIcon.Warning, 1000)
+        }
+        
+        onPose_signal: {
+            systemTray.showMessage(qsTr("Your ba"), qsTr("Something important came up"), SystemTrayIcon.Critical, 1000)
+        }
+        
+    }
+    
+    
+    QSystemTrayIcon {
+        id: systemTray
+        
+        // Initial initialization of the system tray
+        Component.onCompleted: {
+            icon = iconTray             // Set icon
+            toolTip = "Tray Program"
+            show()
+            //showMessage(qsTr("Message title"), qsTr("Something important came up"), SystemTrayIcon.Information, 1000)
+        }
+        
+        /* By clicking on the tray icon define the left or right mouse button click was.
+         * If left, then hide or open the application window.
+         * If right, then open the System Tray menu
+         * */
+        onActivated: {
+            if(reason === 1){
+                trayMenu.open()
+            } else {
+                if(window.visibility === Window.Hidden) {
+                    window.show()
+                } else {
+                    window.hide()
+                }
+            }
+        }
+    }
+    
+    // Menu system tray
+    Menu {
+        id: trayMenu
+        
+        MenuItem {
+            text: qsTr("Maximize window")
+            onTriggered: window.show()
+        }
+        
+        MenuItem {
+            text: qsTr("Exit")
+            onTriggered: {
+                checkTray.checked = false
+                window.close()
+            }
+        }
+    }
+    
+    CheckBox {
+        id: checkTray
+        x: 800
+        y: 800
+        //anchors.centerIn: parent
+        text: qsTr("Enable minimizing to system tray during the closing the window")
+    }
+    onClosing: {
+        if(checkTray.checked === true){
+            close.accepted = false
+            systemTray.show()
+            window.hide()
+        } else {
+            systemTray.hide()
+            Qt.quit()
+        }
+    }
+    
+    Flickable {
+        id: flickable
+        y: 0
+        width: 500
+        height: parent.height
+        anchors.left: parent.left
+        anchors.leftMargin: 0
+        transformOrigin: Item.TopLeft
+        flickableDirection: Flickable.VerticalFlick
+        contentWidth: width; contentHeight: 1600
+        
+        Rectangle {
+            width: parent.width
+            height: parent.height
+            
+            transformOrigin: Item.TopLeft
+            anchors.right: flickable.left
+            y: parent.visibleArea * parent.height
+            
+            color: "#3b3a3a"
+            
+            Column {
+                id: column
+                x: 0
+                y: 235
+                width: 500
+                height: 273
+                
+                Slider {
+                    id: scolio_degree
+                    width: 353
+                    height: 40
+                    anchors.right: parent.right
+                    anchors.rightMargin: 10
+                    value: 7.5
+                    rotation: 180
+                    from: 2
+                    to: 10
+                    stepSize: 0.5
+                }
+                
+                Slider {
+                    id: turtle_degree
+                    width: 353
+                    height: 40
+                    anchors.right: parent.right
+                    anchors.rightMargin: 10
+                    transformOrigin: Item.Center
+                    value: 3.5
+                    rotation: 180
+                    from: 1
+                    to: 7
+                    stepSize: 0.5
+                }
+                
+            }
+            
+            
+            
+        }
+        
+        ScrollBar.vertical: ScrollBar {
+            width: 10
+            anchors.left: parent.right // adjust the anchor as suggested by derM
+            policy: ScrollBar.AsNeeded
+        }
+        
+        
+        SwitchDelegate {
+            id: camera_Switch
+            x: 25
+            y: 422
+            width: parent.width - 50
+            height: 50
+            text: "<font color='#fefefe' size='5'>" + qsTr("Camera") + "</font>"
+            transformOrigin: Item.Left
+            
+            anchors.right: parent.right
+            anchors.rightMargin: 25
+            
+            Component.onCompleted: {
+                
+            }
+            
+            onToggled:{
+                realsense.onoff(checked)
+                
+                this.en_disable(false)
+            }
+            
+            function en_disable(toggled) {
+                this.enabled = toggled
+            }
+            
+            
+            
+        }
+        
+        Slider {
+            id: distance
+            x: 116
+            y: 480
+            width: 353
+            height: 40
+            from: 0.5
+            stepSize: 0.1
+            rotation: 180
+            to: 3
+            value: 1
+            
+            onMoved: {
+                settings.setValue("distance", this.value)
+                console.log("%f", settings.value("distance"))
+            }
+            
+        }
+        
+        SwitchDelegate {
+            id: head_Switch
+            x: 25
+            y: 591
+            width: parent.width - 50
+            height: 50
+            //enabled: false
+            text: "<font color='#fefefe' size='5'>" + qsTr("Face") + "</font>"
+            transformOrigin: Item.Left
+            anchors.right: parent.right
+            anchors.rightMargin: 25
+            
+            Component.onCompleted: {
+                
+            }
+            
+            onToggled: {
+                head.onoff(checked)
+                proc.head_Status(checked)
+                
+            }
+            
+        }
+        
+        SwitchDelegate {
+            id: body_Switch
+            x: 25
+            y: 659
+            width: parent.width - 50
+            height: 50
+            text: "<font color='#fefefe' size='5'>" + qsTr("Body") + "</font>"
+            anchors.rightMargin: 25
+            anchors.right: parent.right
+            transformOrigin: Item.Left
+            
+            onToggled: {
+                body.onoff(checked)
+            }
+            
+        }
+        
+        
+    }
+    Rectangle {
+        id: camview_rec
+        width: 640
+        height: 480
+        x: 800
+        y: 100
+        color:window.color
+        
+        ImageItem {
+            id: camwiew
+            width: camview_rec.width
+            height: camview_rec.height
+            x: 0
+            y: 0
+            
+        }
+    }
+    
+    
+    
+    Rectangle {
+        id: camview_rec2
+        width: 640
+        height: 640
+        x: 800 + width
+        y: 100
+        color: window.color
+        
+        
+        Display {
+            id: display
+            width: parent.width
+            height: parent.height
+            
+            Component.onCompleted: {
+                get_posePointer(pose)
+            }
+            //anchors.fill:parent
+            
+        }
+        
+        MouseArea {
+            anchors.fill: parent
+            onPositionChanged: {
+                console.log("x=", mouseX, "y=" , mouseX);
+            }
+        }
+        
+        
+    }
+    Rectangle {
+        x: 2024
+        y: 880
+        width: 376
+        height: 120
+        color: window.color
+        
+        
+        
+        StatusIndicator {
+            id: turtleneck_led
+            x: 230
+            y: 10
+            width: 100
+            height: 100
+            color: "#008000"
+        }
+        
+        
+        StatusIndicator {
+            id: scoliosis_led
+            x: 78
+            y: 10
+            width: 100
+            height: 100
+            color: "green"
+        }
+    }
+    
+    ListModel {
+        id: value
+        
+        ListElement {
+            name: "Head X"
+            cost: 0
+        }
+        ListElement {
+            name: "Head Y"
+            cost: 0
+            
+        }
+        ListElement {
+            name: "Head Z"
+            cost: 0
+        }
+    }
+    Component {
+        id: fruitDelegate
+        Item {
+            x: 510
+            y: 50
+            width: 200; height: 25
+            Text { text: "<font color='#fefefe' size='5'>" + name + "</font>"; anchors.left: parent.left }
+            Text { text: "<font color='#fefefe' size='5'>" + cost + "</font>"; anchors.right: parent.right }
+        }
+    }
+    
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
